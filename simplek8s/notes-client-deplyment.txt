@@ -1,0 +1,19 @@
+apiVersion: apps/v1 --> deployment is available on this apiVersion 
+kind: Deployment
+metadata:
+    name: client-deployment
+spec:
+    replicas: 1 --> number of pods to create
+    selector:
+        matchLabels:
+            component: web ---> this tells the deployment to look for pods with this selector combo as pods can have multiple labels
+    template:
+        metadata:
+            labels:
+                component: web --> label of the pod 
+        spec:
+            containers: --> pod template, same as client-pod.yaml
+                - name: client
+                  image: stephengrider/multi-client
+                  ports:
+                      - containerPort: 3000 --> nginx inside multi-client image will listen on this port

@@ -1,0 +1,56 @@
+client-pod file:
+-----------------------------------
+- With these k8s config files, we dont exactly create containers. We create objects.
+- Some example of object types(referred with the keyword "kind" in the.yaml files):
+    - StatefulSet
+    - ReplicaController
+    - Pod 
+    - Service 
+- Each of these types serve a specific purpose, like Pod is used to run a container 
+- Service type object is used to setup networking, etc
+- apiVersion: a certain apiVersion gives us access to certain types of objects 
+- In K8s, we create a VM or a node, inside which we will have a Pod which will have one/more containers
+- The containers we group inside a pod must be tightly coupled, meaning they must be very integral
+- to each other, like say a DB, a DB logger and a Backup Manager. 
+
+apiVersion: v1
+kind: Pod
+metadata:
+    name: client-pod
+    labels:
+        component: web --> acts as a selector
+spec:
+    containers: --> list of containers we will run inside this pod 
+        - name: client --> name of the pod, for reference, logging and networking like in docker compose 
+          image: stephengrider/multi-client --> docker image to pull
+          ports: --> this is the port we will expose to the outside world. But its not the entire config
+              - containerPort: 3000 --> it was the port used in docker image by nginx. 
+=======================================================================================
+client-node-port.yaml (Service type)
+- Service type objects are used for networking purposes 
+- there are 4 types of services:
+    - ClusterIP 
+    - NodePort (exposes a port to the outside world, used only for dev purposes)
+    - LoadBalancer
+    - Ingress
+
+spec:
+    type: NodePort
+    ports:
+        - port: 3050 --> used for internal networking, another pod in the same node can connect using this
+          targetPort: 3000 -->  port inside pod that we are exposing to the world
+          nodePort: 31515 --> this is the port we use on our local machine to access targetPort
+          (must always be between 30000-32767)
+    selector:
+        component: web --> tell this svc obj to look for all containers with key value pair of 
+(component,web). This is connected to metadata.labels of the client-pod.yaml. Note that both 
+component and web are arbitrary, both of them could have been any other words
+-----------------------------------------------------------------------------
+==>kubectl apply -f client-pod.yaml 
+pod/client-pod created
+==>souvikmandal@Souviks-MacBook-Pro-2 simplek8s % kubectl apply -f client-node-port.yaml 
+service/client-node-port created
+
+--> kubectl apply -f client-pod.yaml  :--> changes the configuration of our cluster
+--> kubectl get pods :--> print status of all running pods
+--> kubectl get <obj_type>
