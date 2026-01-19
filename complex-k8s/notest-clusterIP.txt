@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service --> cluster ip is a service type obj
+metadata:
+    name: client-cluster-ip-service --> name of this obj
+spec:
+    type: ClusterIP --> type of Service, note the casing, it is a keyword
+    selector:
+        component: web --> this must be the same as the pod we are targeting
+    ports:
+        - port: 3000 --> port exposed to other pods in our node
+          targetPort: 3000 --> port maps to targetPort, our code will be 
+            running on this port inside the pod

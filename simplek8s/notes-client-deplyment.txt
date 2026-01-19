@@ -6,14 +6,16 @@ spec:
     replicas: 1 --> number of pods to create
     selector:
         matchLabels:
-            component: web ---> this tells the deployment to look for pods with this selector combo as pods can have multiple labels
+            component: web ---> this tells the deployment to look for pods with this selector combo 
+            as pods can have multiple labels
     template:
         metadata:
             labels:
-                component: web --> label of the pod 
+                component: web --> label of the pod (can have multiple key val pairs here one of which 
+                must match the keyval pair in matchlabels abouve)
         spec:
             containers: --> pod template, same as client-pod.yaml
-                - name: client
+                - name: client --> name of the container
                   image: stephengrider/multi-client
                   ports:
                       - containerPort: 3000 --> nginx inside multi-client image will listen on this port
