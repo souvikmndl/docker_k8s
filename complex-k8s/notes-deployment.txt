@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: postgres-deployment
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            component: postgres
+    template:
+        metadata:
+            labels:
+                component: postgres
+        spec:
+            volumes: --> connect the postgres deployment with the PVC with this given name
+                - name: postgres-storage
+                  persistentVolumeClaim:
+                      claimName: database-persistent-volume-claim
+            containers:
+                - name: postgres
+                  image: postgres
+                  ports:
+                      - containerPort: 5432
+                volumeMounts: --> connects the pVC to the pod
+                      - name: postgres-storage --> name must match the name of the volume above
+                        mountPath: /var/lib/postgresql --> this is where psql stores data in our 
+                        data, this is what we will store in our volume
+                        subPath: postgres
+                        subPath means that anything inside the mountPath will be stored inside the subPath in PVC
+                 env:
+                      - name: PGDATABASE
+                        value: postgres
+                    --> kubectl create secret generic pgpassword --from-literal PGPASSWORD=pa55word
+                      - name: PGPASSWORD  --> this will be used to reference in our pods
+                        valueFrom:
+                            secretKeyRef:
+                                name: pgpassword --> name of the secret we created
+                                key: PGPASSWORD --> the key name passed in the create secret cmd, can be anything, 
+                                                    has no relation to the above PGPASSWORD name
